@@ -36,12 +36,16 @@ class Book(object):
         self.publisher = ''
         self.year_release = ''
         self.number_of_pages = ''
+        self.book_type = ''
+        self.book_size = ''
 
     def __str__(self):
         return 'ISBN: ' + self.isbn + ' Naziv knjige: ' + self.book_name + ' Author: ' + self.author_name + ' ' \
                + self.author_surname + ' Izdanje: ' + self.release + ' Izdavač: ' + self.publisher \
                + ' Godina izdavanja: ' + self.year_release + ' Language: ' \
-               + self.book_language + ' Country: ' + self.country_release + ' City: ' + self.city_publisher
+               + self.book_language + ' Country: ' + self.country_release + ' City: ' + self.city_publisher \
+               + ' Number of pages: ' + self.number_of_pages + ' Book type: ' + self.book_type + ' Book size: ' \
+               + self.book_size
 
 
 def parse_book_file(ln=''):
@@ -52,28 +56,26 @@ def parse_book_file(ln=''):
     books.append(book)
 
     # PARSING ISBN CODE
-    book_isbn = re.split(chr(30) + '010..' + chr(31) + 'a', ln)
 
+    book_isbn = re.split(chr(30) + '010..' + chr(31) + 'a', ln)
     if len(book_isbn) > 1:
         for i in range(0, len(book_isbn[1])):
             if book_isbn[1][i] == chr(30) or book_isbn[1][i] == chr(31) or book_isbn[1][i] == '\n':
                 break
             book.isbn = book.isbn + book_isbn[1][i]
 
-
     # PARSING LANGUAGE OF BOOK
-    book_language = re.split(chr(30) + '1010.' + chr(31) + 'a', ln)
 
+    book_language = re.split(chr(30) + '1010.' + chr(31) + 'a', ln)
     if len(book_language) > 1:
         for i in range(0, len(book_language[1])):
             if book_language[1][i] == chr(30) or book_language[1][i] == chr(31) or book_language[1][i] == '\n':
                 break
             book.book_language = book.book_language + book_language[1][i]
 
-
     # PARSING COUNTRY OF RELEASE
-    book_country_release = re.split(chr(30) + '102..' + chr(31) + 'a', ln)
 
+    book_country_release = re.split(chr(30) + '102..' + chr(31) + 'a', ln)
     if len(book_country_release) > 1:
         for i in range(0, len(book_country_release[1])):
             if book_country_release[1][i] == chr(30) or book_country_release[1][i] == chr(31) \
@@ -81,40 +83,17 @@ def parse_book_file(ln=''):
                 break
             book.country_release = book.country_release + book_country_release[1][i]
 
-
-
     # PARSING BOOK NAME
-    book_name = re.split(chr(30) + '200..' + chr(31) + 'a', ln)
 
+    book_name = re.split(chr(30) + '200..' + chr(31) + 'a', ln)
     for i in range(0, len(book_name[1])):
         if book_name[1][i] == chr(30) or book_name[1][i] == chr(31) or book_name[1][i] == '\n':
             break
         book.book_name = book.book_name + book_name[1][i]
 
-    # PARSING AUTHOR NAME
-    book_author_surname = re.split(chr(30) + '700.1' + chr(31) + '4070' + chr(31) + 'a', ln)
-
-    if len(book_author_surname) == 2:
-
-        for i in range(0, len(book_author_surname[1])):
-            if book_author_surname[1][i] == chr(30) or book_author_surname[1][i] == chr(31) \
-                    or book_author_surname[1][i] == '\n':
-                break
-            book.author_surname = book.author_surname + book_author_surname[1][i]
-
-        book_author_name = re.split(chr(31) + 'b', book_author_surname[1])
-
-        if len(book_author_name) > 1:
-            for i in range(0, len(book_author_name[1])):
-                if book_author_name[1][i] == chr(30) or book_author_name[1][i] == chr(31) \
-                        or book_author_name[1][i] == '\n':
-                    break
-                book.author_name = book.author_name + book_author_name[1][i]
-
     # PARSING RELEASE
 
     book_release = re.split(chr(30) + '205..' + chr(31) + 'a', ln)
-
     if len(book_release) > 1:
         for i in range(0, len(book_release[1])):
             if book_release[1][i] == chr(30) or book_release[1][i] == chr(31) or book_release[1][i] == '\n':
@@ -124,7 +103,6 @@ def parse_book_file(ln=''):
     # PARSING PUBLISHER
 
     book_publisher = re.split(chr(30) + '210..', ln)
-
     if len(book_publisher) > 1:
         book_publisher_city = re.split(chr(31) + 'a', book_publisher[1])
 
@@ -135,7 +113,6 @@ def parse_book_file(ln=''):
             book.city_publisher = book.city_publisher + book_publisher_city[1][i]
 
         book_publisher_name = re.split(chr(31) + 'c', book_publisher[1])
-
         if len(book_publisher_name) > 1:
             for i in range(0, len(book_publisher_name[1])):
                 if book_publisher_name[1][i] == chr(30) or book_publisher_name[1][i] == chr(31) \
@@ -144,13 +121,58 @@ def parse_book_file(ln=''):
                 book.publisher = book.publisher + book_publisher_name[1][i]
 
         book_publisher_year = re.split(chr(31) + 'd', book_publisher[1])
-
         if len(book_publisher_year) > 1:
             for i in range(0, len(book_publisher_year[1])):
                 if book_publisher_year[1][i] == chr(30) or book_publisher_year[1][i] == chr(31) \
                         or book_publisher_year[1][i] == '\n':
                     break
                 book.year_release = book.year_release + book_publisher_year[1][i]
+
+    # PARSING BOOK INFO
+
+        book_info = re.split(chr(30) + '215..', ln)
+        if len(book_info) > 1:
+            book_pages = re.split(chr(31) + 'a', book_info[1])
+            if len(book_pages) > 1:
+                for i in range(0, len(book_pages[1])):
+                    if book_pages[1][i] == chr(30) or book_pages[1][i] == chr(31) or book_pages[1][i] == '\n':
+                        break
+                    book.number_of_pages = book.number_of_pages + book_pages[1][i]
+
+            book_type = re.split(chr(31) + 'c', book_info[1])
+            if len(book_type) > 1:
+                for i in range(0, len(book_type[1])):
+                    if book_type[1][i] == chr(30) or book_type[1][i] == chr(31) or book_type[1][i] == '\n':
+                        break
+                    book.book_type = book.book_type + book_type[1][i]
+
+            book_size = re.split(chr(31) + 'd', book_info[1])
+            if len(book_size) > 1:
+                for i in range(0, len(book_size[1])):
+                    if book_size[1][i] == chr(30) or book_size[1][i] == chr(31) or book_size[1][i] == '\n':
+                        break
+                    book.book_size = book.book_size + book_size[1][i]
+
+    # PARSING AUTHOR NAME
+
+        book_author = re.split(chr(30) + '700.1', ln)
+        if len(book_author) > 1:
+
+            book_author_surname = re.split(chr(31) + '4070' + chr(31) + 'a', book_author[1])
+            if len(book_author_surname) > 1:
+                for i in range(0, len(book_author_surname[1])):
+                    if book_author_surname[1][i] == chr(30) or book_author_surname[1][i] == chr(31) \
+                            or book_author_surname[1][i] == '\n':
+                        break
+                    book.author_surname = book.author_surname + book_author_surname[1][i]
+
+            book_author_name = re.split(chr(31) + 'b', book_author[1])
+            if len(book_author_name) > 1:
+                for i in range(0, len(book_author_name[1])):
+                    if book_author_name[1][i] == chr(30) or book_author_name[1][i] == chr(31) \
+                            or book_author_name[1][i] == '\n':
+                        break
+                    book.author_name = book.author_name + book_author_name[1][i]
 
 
 def parse_prefix_file(ln=''):
