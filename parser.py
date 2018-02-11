@@ -1,6 +1,5 @@
 import re
 
-count = 0
 books = []
 prefixes = []
 prefix_names = []
