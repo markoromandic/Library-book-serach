@@ -2,6 +2,27 @@ import re
 
 count = 0
 books = []
+prefixes = []
+prefix_names = []
+
+
+class PrefixName(object):
+    def __init__(self):
+        self.code = ''
+        self.name = ''
+
+    def __str__(self):
+        return 'Code: ' + self.code + ' Name: ' + self.name
+
+
+class Prefix(object):
+    def __init__(self):
+        self.name = ''
+        self.code = ''
+
+    def __str__(self):
+        return 'Name: ' + self.name + ' Code: ' + self.code
+
 
 class Book(object):
     def __init__(self):
@@ -18,13 +39,11 @@ class Book(object):
 
 
 def parse_book_file(ln=''):
-    global count, books
+    global books
 
     book = Book()
 
     books.append(book)
-
-    count += 1
 
     # PARSING BOOK NAME
     book_name = re.split(chr(30) + '200..' + chr(31) + 'a', ln)
@@ -90,11 +109,68 @@ def parse_book_file(ln=''):
                 book.year_release = book.year_release + book_year_release[1][i]
 
 
-with open(file='fajlovi/knjige.txt', encoding="utf8") as fp:
+def parse_prefix_file(ln=''):
+    global prefixes
+
+    ln = re.split('-', ln)
+
+    prefix = Prefix()
+
+    prefixes.append(prefix)
+
+    for i in range(0, len(ln[0])):
+        if ln[0][i] == '\n':
+            break
+        prefix.name = prefix.name + ln[0][i]
+
+    for i in range(0, len(ln[1])):
+        if ln[1][i] == '\n':
+            break
+        prefix.code = prefix.code + ln[1][i]
+
+
+def parse_prefix_names_file(ln=''):
+    global prefix_names
+
+    ln = re.split('=', ln)
+
+    prefix_name = PrefixName()
+
+    prefix_names.append(prefix_name)
+
+    for i in range(0, len(ln[0])):
+        if ln[0][i] == '\n':
+            break
+        prefix_name.code = prefix_name.code + ln[0][i]
+
+    for i in range(0, len(ln[1])):
+        if ln[1][i] == '\n':
+            break
+        prefix_name.name = prefix_name.name + ln[1][i]
+
+
+with open(file='fajlovi/knjige.txt', encoding='utf8') as fp:
     for line in fp:
         parse_book_file(ln=line)
 
-    for b in books:
-        print(b)
 
+for b in books:
+    print(b)
+
+
+with open(file='fajlovi/prefiksi.txt', encoding='utf8') as fp:
+    for line in fp:
+        parse_prefix_file(ln=line)
+
+for p in prefixes:
+    print(p)
+
+
+with open(file='fajlovi/PrefixNames_sr.properties', encoding='utf8') as fp:
+    for line in fp:
+        parse_prefix_names_file(ln=line)
+
+
+for p_n in prefix_names:
+    print(p_n)
 
