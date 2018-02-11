@@ -1,7 +1,7 @@
 import re
 
 count = 0
-
+books = []
 
 class Book(object):
     def __init__(self):
@@ -17,9 +17,11 @@ class Book(object):
 
 
 def parse_book_file(ln=''):
-    global count
+    global count, books
 
     book = Book()
+
+    books.append(book)
 
     count += 1
 
@@ -67,11 +69,14 @@ def parse_book_file(ln=''):
 
     # PARSING PUBLISHER
 
-    print(count, book)
+    # print(count, book)
 
 
 with open(file='fajlovi/knjige.txt', encoding="utf8") as fp:
     for line in fp:
         parse_book_file(ln=line)
+
+    for b in books:
+        print(b)
 
 
