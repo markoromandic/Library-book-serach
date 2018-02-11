@@ -1,6 +1,6 @@
 import re
 
-count = 1
+count = 0
 
 
 class Book(object):
@@ -8,9 +8,12 @@ class Book(object):
         self.book_name = ''
         self.author_name = ''
         self.author_surname = ''
+        self.release = ''
+        self.publisher = ''
 
     def __str__(self):
-        return 'Naziv knjige: ' + self.book_name + ' Author: ' + self.author_name + ' ' + self.author_surname
+        return 'Naziv knjige: ' + self.book_name + ' Author: ' + self.author_name + ' ' + self.author_surname + \
+               ' Izdanje: ' + self.release
 
 
 def parse_book_file(ln=''):
@@ -18,11 +21,13 @@ def parse_book_file(ln=''):
 
     book = Book()
 
+    count += 1
+
     # PARSING BOOK NAME
     book_name = re.split(chr(30) + '200..' + chr(31) + 'a', ln)
 
     for i in range(0, len(book_name[1])):
-        if book_name[1][i] == chr(30) or book_name[1][i] == chr(31):
+        if book_name[1][i] == chr(30) or book_name[1][i] == chr(31) or book_name[1][i] == '\n':
             break
         book.book_name = book.book_name + book_name[1][i]
 
@@ -31,10 +36,9 @@ def parse_book_file(ln=''):
 
     if len(book_author_surname) == 2:
 
-        iterator = iter(range(0, len(book_author_surname[1])))
-
-        for i in iterator:
-            if book_author_surname[1][i] == chr(30) or book_author_surname[1][i] == chr(31):
+        for i in range(0, len(book_author_surname[1])):
+            if book_author_surname[1][i] == chr(30) or book_author_surname[1][i] == chr(31) \
+                    or book_author_surname[1][i] == '\n':
                 break
             book.author_surname = book.author_surname + book_author_surname[1][i]
 
@@ -43,36 +47,28 @@ def parse_book_file(ln=''):
         if len(book_author_name) == 1:
             return
 
-        iterator = iter(range(0, len(book_author_name[1])))
-
-        for i in iterator:
-            if book_author_name[1][i] == chr(30) or book_author_name[1][i] == chr(31):
+        for i in range(0, len(book_author_name[1])):
+            if book_author_name[1][i] == chr(30) or book_author_name[1][i] == chr(31) \
+                    or book_author_name[1][i] == '\n':
                 break
             book.author_name = book.author_name + book_author_name[1][i]
 
-        print(count, book)
+    # PARSING RELEASE
 
-    count += 1
+    book_release = re.split(chr(30) + '205..' + chr(31) + 'a', ln)
 
+    if len(book_release) == 1:
+        return
 
+    for i in range(0, len(book_release[1])):
+        if book_release[1][i] == chr(30) or book_release[1][i] == chr(31) or book_release[1][i] == '\n':
+            break
+        book.release = book.release + book_release[1][i]
 
-def parse_line(ln=''):
-    firstPart = re.split(chr(31) + 'b', name[1])
-    if len(firstPart) < 2:
-        firstPart = re.split(chr(31), name[1])
-        # print(firstPart)
-        firstPart = re.split(chr(30), firstPart[0])
-        # print(firstPart[0])
-        secondPart = re.split(chr(30), firstPart[0])
-    else:
-        secondPart = re.split(chr(30), firstPart[1])
-        if chr(31) in secondPart[0]:
-            secondPart = re.split(chr(31), secondPart[0])
-    print(count, firstPart[0], secondPart[0])
+    # PARSING PUBLISHER
 
-    # if len(numReprinted) > 1:
-    #     numReprinted = re.split(chr(31), numReprinted[1])
-    #     print(numReprinted[0])
+    print(count, book)
+
 
 with open(file='fajlovi/knjige.txt', encoding="utf8") as fp:
     for line in fp:
