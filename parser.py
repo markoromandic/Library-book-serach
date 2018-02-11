@@ -29,16 +29,19 @@ def parse_book_file(ln=''):
     book_author_name = re.split(chr(30) + '700.1' + chr(31) + '4070' + chr(31) + 'a', ln)
 
     if len(book_author_name) == 2:
-        book_author_name = re.split(chr(31) + 'b', book_author_name[1])
 
-        for i in range(0, len(book_author_name[0])):
-            if book_author_name[0][i] == chr(30):
+        iterator = iter(range(0, len(book_author_name[1])))
+
+        for i in iterator:
+            if book_author_name[1][i] == chr(30):
                 break
-            elif book_author_name[0][i] == chr(31):
-                if book_author_name[0][i + 1] is not 'b':
+            elif book_author_name[1][i] == chr(31):
+                if book_author_name[1][i + 1] == 'b':
+                    book.author_name = book.author_name + ' '
+                    next(iterator, None)
                     continue
-                book.author_name = book.author_name + ' '
-            book.author_name = book.author_name + book_author_name[0][i]
+                break
+            book.author_name = book.author_name + book_author_name[1][i]
 
         print(count, book)
 
