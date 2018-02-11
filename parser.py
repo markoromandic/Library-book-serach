@@ -4,12 +4,13 @@ count = 1
 
 
 class Book(object):
-    def __init__(self, book_name='', author_name=''):
-        self.book_name = book_name
-        self.author_name = author_name
+    def __init__(self):
+        self.book_name = ''
+        self.author_name = ''
+        self.author_surname = ''
 
     def __str__(self):
-        return 'Naziv knjige: ' + self.book_name + ' Author: ' + self.author_name
+        return 'Naziv knjige: ' + self.book_name + ' Author: ' + self.author_name + ' ' + self.author_surname
 
 
 def parse_book_file(ln=''):
@@ -26,26 +27,32 @@ def parse_book_file(ln=''):
         book.book_name = book.book_name + book_name[1][i]
 
     # PARSING AUTHOR NAME
-    book_author_name = re.split(chr(30) + '700.1' + chr(31) + '4070' + chr(31) + 'a', ln)
+    book_author_surname = re.split(chr(30) + '700.1' + chr(31) + '4070' + chr(31) + 'a', ln)
 
-    if len(book_author_name) == 2:
+    if len(book_author_surname) == 2:
+
+        iterator = iter(range(0, len(book_author_surname[1])))
+
+        for i in iterator:
+            if book_author_surname[1][i] == chr(30) or book_author_surname[1][i] == chr(31):
+                break
+            book.author_surname = book.author_surname + book_author_surname[1][i]
+
+        book_author_name = re.split(chr(31) + 'b', book_author_surname[1])
+
+        if len(book_author_name) == 1:
+            return
 
         iterator = iter(range(0, len(book_author_name[1])))
 
         for i in iterator:
-            if book_author_name[1][i] == chr(30):
-                break
-            elif book_author_name[1][i] == chr(31):
-                if book_author_name[1][i + 1] == 'b':
-                    book.author_name = book.author_name + ' '
-                    next(iterator, None)
-                    continue
+            if book_author_name[1][i] == chr(30) or book_author_name[1][i] == chr(31):
                 break
             book.author_name = book.author_name + book_author_name[1][i]
 
         print(count, book)
 
-    count += +1
+    count += 1
 
 
 
