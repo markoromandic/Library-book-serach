@@ -13,7 +13,7 @@ class Book(object):
 
     def __str__(self):
         return 'Naziv knjige: ' + self.book_name + ' Author: ' + self.author_name + ' ' + self.author_surname + \
-               ' Izdanje: ' + self.release
+               ' Izdanje: ' + self.release + 'Publisher: ' + self.publisher
 
 
 def parse_book_file(ln=''):
@@ -69,7 +69,6 @@ def parse_book_file(ln=''):
 
     # PARSING PUBLISHER
 
-    # print(count, book)
 
 
 with open(file='fajlovi/knjige.txt', encoding="utf8") as fp:
