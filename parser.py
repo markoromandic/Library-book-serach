@@ -5,6 +5,43 @@ prefixes = []
 prefix_names = []
 
 
+class Book(object):
+    def __init__(self):
+        self.records = []
+
+    def __str__(self):
+        print('START_BOOK_RECORDS')
+        for r in self.records:
+            print(r)
+        return 'END_BOOK_RECORDS'
+
+
+class Record(object):
+    def __init__(self):
+        self.record_code = ''
+        self.subfields = []
+
+    def prepareSubfields(self):
+        line = ''
+
+        for s in self.subfields:
+            line = line + '| Subfield code: ' + s.subfield_code + ' Subfield data: ' + s.data
+
+        return line
+
+    def __str__(self):
+        return 'Record code: ' + self.record_code + ' Subfields: ' + self.prepareSubfields()
+
+
+class SubfieldRecord(object):
+    def __init__(self, subfield_code=''):
+        self.subfield_code = subfield_code
+        self.data = ''
+
+    def __str__(self):
+        return 'Subfield code: ' + self.subfield_code + ' Data: ' + self.data
+
+
 class PrefixName(object):
     def __init__(self):
         self.code = ''
@@ -23,156 +60,85 @@ class Prefix(object):
         return 'Name: ' + self.name + ' Code: ' + self.code
 
 
-class Book(object):
-    def __init__(self):
-        self.isbn = ''
-        self.book_language = ''
-        self.country_release = ''
-        self.city_publisher = ''
-        self.book_name = ''
-        self.author_name = ''
-        self.author_surname = ''
-        self.release = ''
-        self.publisher = ''
-        self.year_release = ''
-        self.number_of_pages = ''
-        self.book_type = ''
-        self.book_size = ''
-
-    def __str__(self):
-        return 'ISBN: ' + self.isbn + ' Naziv knjige: ' + self.book_name + ' Author: ' + self.author_name + ' ' \
-               + self.author_surname + ' Izdanje: ' + self.release + ' Izdavač: ' + self.publisher \
-               + ' Godina izdavanja: ' + self.year_release + ' Language: ' \
-               + self.book_language + ' Country: ' + self.country_release + ' City: ' + self.city_publisher \
-               + ' Number of pages: ' + self.number_of_pages + ' Book type: ' + self.book_type + ' Book size: ' \
-               + self.book_size
-
-
 def parse_book_file(ln=''):
     global books
 
-    book = Book()
+    book_iterator = iter(range(0, len(ln)))
 
-    books.append(book)
+    new_book = Book()
 
-    # PARSING ISBN CODE
+    books.append(new_book)
 
-    book_isbn = re.split(chr(30) + '010..' + chr(31) + 'a', ln)
-    if len(book_isbn) > 1:
-        for i in range(0, len(book_isbn[1])):
-            if book_isbn[1][i] == chr(30) or book_isbn[1][i] == chr(31) or book_isbn[1][i] == '\n':
-                break
-            book.isbn = book.isbn + book_isbn[1][i]
+    # PARSE 001 RECORD - SPECIAL CASE
 
-    # PARSING LANGUAGE OF BOOK
+    new_record = Record()
+    new_book.records.append(new_record)
+    new_record.record_code = ln[0:3]
 
-    book_language = re.split(chr(30) + '1010.' + chr(31) + 'a', ln)
-    if len(book_language) > 1:
-        for i in range(0, len(book_language[1])):
-            if book_language[1][i] == chr(30) or book_language[1][i] == chr(31) or book_language[1][i] == '\n':
-                break
-            book.book_language = book.book_language + book_language[1][i]
+    special_case_iterator = iter(range(3, len(ln)))
 
-    # PARSING COUNTRY OF RELEASE
+    # OTHER RECORDS
 
-    book_country_release = re.split(chr(30) + '102..' + chr(31) + 'a', ln)
-    if len(book_country_release) > 1:
-        for i in range(0, len(book_country_release[1])):
-            if book_country_release[1][i] == chr(30) or book_country_release[1][i] == chr(31) \
-                    or book_country_release[1][i] == '\n':
-                break
-            book.country_release = book.country_release + book_country_release[1][i]
-
-    # PARSING BOOK NAME
-
-    book_name = re.split(chr(30) + '200..' + chr(31) + 'a', ln)
-    for i in range(0, len(book_name[1])):
-        if book_name[1][i] == chr(30) or book_name[1][i] == chr(31) or book_name[1][i] == '\n':
+    for i in special_case_iterator:
+        if ln[i] is chr(30) or ln[i] is '\n':
             break
-        book.book_name = book.book_name + book_name[1][i]
+        if ln[i] is chr(31):
+            i = next(special_case_iterator, None)
+            new_subfield = SubfieldRecord(subfield_code=ln[i])
 
-    # PARSING RELEASE
+            new_record.subfields.append(new_subfield)
 
-    book_release = re.split(chr(30) + '205..' + chr(31) + 'a', ln)
-    if len(book_release) > 1:
-        for i in range(0, len(book_release[1])):
-            if book_release[1][i] == chr(30) or book_release[1][i] == chr(31) or book_release[1][i] == '\n':
-                break
-            book.release = book.release + book_release[1][i]
+            if ln[i + 1] is chr(30) or ln[i + 1] is chr(31) or ln[i + 1] is '\n':
+                continue
 
-    # PARSING PUBLISHER
+            i = next(special_case_iterator, None)
+            subfield_data_iter = iter(range(i, len(ln)))
 
-    book_publisher = re.split(chr(30) + '210..', ln)
-    if len(book_publisher) > 1:
-        book_publisher_city = re.split(chr(31) + 'a', book_publisher[1])
-
-        for i in range(0, len(book_publisher_city[1])):
-            if book_publisher_city[1][i] == chr(30) or book_publisher_city[1][i] == chr(31) \
-                    or book_publisher_city[1][i] == '\n':
-                break
-            book.city_publisher = book.city_publisher + book_publisher_city[1][i]
-
-        book_publisher_name = re.split(chr(31) + 'c', book_publisher[1])
-        if len(book_publisher_name) > 1:
-            for i in range(0, len(book_publisher_name[1])):
-                if book_publisher_name[1][i] == chr(30) or book_publisher_name[1][i] == chr(31) \
-                        or book_publisher_name[1][i] == '\n':
+            for k in subfield_data_iter:
+                if ln[k] is chr(30) or ln[k] is chr(31) or ln[k] is '\n':
                     break
-                book.publisher = book.publisher + book_publisher_name[1][i]
+                new_subfield.data = new_subfield.data + ln[k]
 
-        book_publisher_year = re.split(chr(31) + 'd', book_publisher[1])
-        if len(book_publisher_year) > 1:
-            for i in range(0, len(book_publisher_year[1])):
-                if book_publisher_year[1][i] == chr(30) or book_publisher_year[1][i] == chr(31) \
-                        or book_publisher_year[1][i] == '\n':
+            for m in range(i, k - 1):
+                next(special_case_iterator, None)
+
+    for i in book_iterator:
+        if ln[i] is '\n':
+            break
+        if ln[i] is chr(30):
+            new_record = Record()
+            for j in range(0, 3):
+                i = next(book_iterator, None)
+                if i is None:
+                    print('I is None')
+                new_record.record_code = new_record.record_code + ln[i]
+            new_book.records.append(new_record)
+
+            record_iterator = iter(range(i, len(ln)))
+
+            for j in record_iterator:
+                if ln[j] is chr(30) or ln[j] is '\n':
                     break
-                book.year_release = book.year_release + book_publisher_year[1][i]
+                if ln[j] is chr(31):
+                    j = next(record_iterator, None)
 
-    # PARSING BOOK INFO
+                    new_subfield = SubfieldRecord(subfield_code=ln[j])
 
-        book_info = re.split(chr(30) + '215..', ln)
-        if len(book_info) > 1:
-            book_pages = re.split(chr(31) + 'a', book_info[1])
-            if len(book_pages) > 1:
-                for i in range(0, len(book_pages[1])):
-                    if book_pages[1][i] == chr(30) or book_pages[1][i] == chr(31) or book_pages[1][i] == '\n':
-                        break
-                    book.number_of_pages = book.number_of_pages + book_pages[1][i]
+                    new_record.subfields.append(new_subfield)
 
-            book_type = re.split(chr(31) + 'c', book_info[1])
-            if len(book_type) > 1:
-                for i in range(0, len(book_type[1])):
-                    if book_type[1][i] == chr(30) or book_type[1][i] == chr(31) or book_type[1][i] == '\n':
-                        break
-                    book.book_type = book.book_type + book_type[1][i]
+                    if ln[j + 1] is chr(30) or ln[j + 1] is chr(31) or ln[j + 1] is '\n':
+                        continue
 
-            book_size = re.split(chr(31) + 'd', book_info[1])
-            if len(book_size) > 1:
-                for i in range(0, len(book_size[1])):
-                    if book_size[1][i] == chr(30) or book_size[1][i] == chr(31) or book_size[1][i] == '\n':
-                        break
-                    book.book_size = book.book_size + book_size[1][i]
+                    j = next(record_iterator, None)
+                    subfield_data_iter = iter(range(j, len(ln)))
 
-    # PARSING AUTHOR NAME
+                    for k in subfield_data_iter:
+                        if ln[k] is chr(30) or ln[k] is chr(31) or ln[k] is '\n':
+                            break
+                        new_subfield.data = new_subfield.data + ln[k]
 
-        book_author = re.split(chr(30) + '700.1', ln)
-        if len(book_author) > 1:
-
-            book_author_surname = re.split(chr(31) + '4070' + chr(31) + 'a', book_author[1])
-            if len(book_author_surname) > 1:
-                for i in range(0, len(book_author_surname[1])):
-                    if book_author_surname[1][i] == chr(30) or book_author_surname[1][i] == chr(31) \
-                            or book_author_surname[1][i] == '\n':
-                        break
-                    book.author_surname = book.author_surname + book_author_surname[1][i]
-
-            book_author_name = re.split(chr(31) + 'b', book_author[1])
-            if len(book_author_name) > 1:
-                for i in range(0, len(book_author_name[1])):
-                    if book_author_name[1][i] == chr(30) or book_author_name[1][i] == chr(31) \
-                            or book_author_name[1][i] == '\n':
-                        break
-                    book.author_name = book.author_name + book_author_name[1][i]
+                    for m in range(j, k - 1):
+                        next(record_iterator, None)
 
 
 def parse_prefix_file(ln=''):
@@ -216,27 +182,26 @@ def parse_prefix_names_file(ln=''):
 
 
 with open(file='fajlovi/knjige.txt', encoding='utf8') as fp:
+    count = 0
     for line in fp:
         parse_book_file(ln=line)
-
 
 for b in books:
     print(b)
 
 
-# with open(file='fajlovi/prefiksi.txt', encoding='utf8') as fp:
-#     for line in fp:
-#         parse_prefix_file(ln=line)
-#
-# for p in prefixes:
-#     print(p)
-#
-#
-# with open(file='fajlovi/PrefixNames_sr.properties', encoding='utf8') as fp:
-#     for line in fp:
-#         parse_prefix_names_file(ln=line)
-#
-#
-# for p_n in prefix_names:
-#     print(p_n)
+with open(file='fajlovi/prefiksi.txt', encoding='utf8') as fp:
+    for line in fp:
+        parse_prefix_file(ln=line)
 
+for p in prefixes:
+    print(p)
+
+
+with open(file='fajlovi/PrefixNames_sr.properties', encoding='utf8') as fp:
+    for line in fp:
+        parse_prefix_names_file(ln=line)
+
+
+for p_n in prefix_names:
+    print(p_n)
