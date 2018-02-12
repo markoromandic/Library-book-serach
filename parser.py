@@ -44,21 +44,21 @@ class SubfieldRecord(object):
 
 
 class PrefixName(object):
-    def __init__(self):
-        self.code = ''
-        self.name = ''
+    def __init__(self, prefix_code='', prefix_name=''):
+        self.prefix_code = prefix_code
+        self.prefix_name = prefix_name
 
     def __str__(self):
-        return 'Code: ' + self.code + ' Name: ' + self.name
+        return 'Prefix code: ' + self.prefix_code + ' Prefix name: ' + self.prefix_name
 
 
 class Prefix(object):
-    def __init__(self):
-        self.name = ''
-        self.code = ''
+    def __init__(self, prefix_code='', record_code=''):
+        self.prefix_code = prefix_code
+        self.record_code = record_code
 
     def __str__(self):
-        return 'Name: ' + self.name + ' Code: ' + self.code
+        return 'Prefix code: ' + self.prefix_code + ' Record code: ' + self.record_code
 
 
 def parse_book_file(ln=''):
@@ -89,19 +89,9 @@ def parse_prefix_file(ln=''):
 
     ln = re.split('-', ln)
 
-    prefix = Prefix()
+    prefix = Prefix(prefix_code=ln[0][0:2], record_code=ln[1][0:4])
 
     prefixes.append(prefix)
-
-    for i in range(0, len(ln[0])):
-        if ln[0][i] == '\n':
-            break
-        prefix.name = prefix.name + ln[0][i]
-
-    for i in range(0, len(ln[1])):
-        if ln[1][i] == '\n':
-            break
-        prefix.code = prefix.code + ln[1][i]
 
 
 def parse_prefix_names_file(ln=''):
@@ -109,19 +99,9 @@ def parse_prefix_names_file(ln=''):
 
     ln = re.split('=', ln)
 
-    prefix_name = PrefixName()
+    prefix_name = PrefixName(prefix_code=ln[0][0:2], prefix_name=ln[1][0:len(ln[1]) - 1])
 
     prefix_names.append(prefix_name)
-
-    for i in range(0, len(ln[0])):
-        if ln[0][i] == '\n':
-            break
-        prefix_name.code = prefix_name.code + ln[0][i]
-
-    for i in range(0, len(ln[1])):
-        if ln[1][i] == '\n':
-            break
-        prefix_name.name = prefix_name.name + ln[1][i]
 
 
 start = time.time()
@@ -139,14 +119,14 @@ with open(file='fajlovi/PrefixNames_sr.properties', encoding='utf8') as fp:
     for line in fp:
         parse_prefix_names_file(ln=line)
 
-# for b in books:
-#     print(b)
-#
-# for p in prefixes:
-#     print(p)
-#
-# for p_n in prefix_names:
-#     print(p_n)
+for b in books:
+    print(b)
+
+for p in prefixes:
+    print(p)
+
+for p_n in prefix_names:
+    print(p_n)
 
 end = time.time()
 print('TOTAL TIME:', end - start)
