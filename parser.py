@@ -1,5 +1,4 @@
 import re
-import time
 
 books = []
 prefixes = []
@@ -104,8 +103,6 @@ def parse_prefix_names_file(ln=''):
     prefix_names.append(prefix_name)
 
 
-start = time.time()
-
 with open(file='fajlovi/knjige.txt', encoding='utf8') as fp:
     count = 0
     for line in fp:
@@ -119,14 +116,11 @@ with open(file='fajlovi/PrefixNames_sr.properties', encoding='utf8') as fp:
     for line in fp:
         parse_prefix_names_file(ln=line)
 
-for b in books:
-    print(b)
-
-for p in prefixes:
-    print(p)
-
-for p_n in prefix_names:
-    print(p_n)
-
-end = time.time()
-print('TOTAL TIME:', end - start)
+# for b in books:
+#     print(b)
+#
+# for p in prefixes:
+#     print(p)
+#
+# for p_n in prefix_names:
+#     print(p_n)
