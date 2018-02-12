@@ -1,4 +1,5 @@
 import re
+import time
 
 books = []
 prefixes = []
@@ -17,8 +18,8 @@ class Book(object):
 
 
 class Record(object):
-    def __init__(self):
-        self.record_code = ''
+    def __init__(self, record_code=''):
+        self.record_code = record_code
         self.subfields = []
 
     def prepareSubfields(self):
@@ -34,9 +35,9 @@ class Record(object):
 
 
 class SubfieldRecord(object):
-    def __init__(self, subfield_code=''):
+    def __init__(self, subfield_code='', data=''):
         self.subfield_code = subfield_code
-        self.data = ''
+        self.data = data
 
     def __str__(self):
         return 'Subfield code: ' + self.subfield_code + ' Data: ' + self.data
@@ -63,82 +64,24 @@ class Prefix(object):
 def parse_book_file(ln=''):
     global books
 
-    book_iterator = iter(range(0, len(ln)))
-
     new_book = Book()
-
     books.append(new_book)
 
-    # PARSE 001 RECORD - SPECIAL CASE
+    records = re.split(chr(30), ln)
 
-    new_record = Record()
-    new_book.records.append(new_record)
-    new_record.record_code = ln[0:3]
+    for r in records:
+        subfields = re.split(chr(31), r)
+        new_record = Record(subfields[0][0:3])
+        new_book.records.append(new_record)
 
-    special_case_iterator = iter(range(3, len(ln)))
-
-    # OTHER RECORDS
-
-    for i in special_case_iterator:
-        if ln[i] is chr(30) or ln[i] is '\n':
-            break
-        if ln[i] is chr(31):
-            i = next(special_case_iterator, None)
-            new_subfield = SubfieldRecord(subfield_code=ln[i])
-
+        for i in range(1, len(subfields)):
+            if subfields[i][len(subfields[i]) - 1] is not '\n':
+                new_subfield = SubfieldRecord(subfield_code=subfields[i][0],
+                                              data=subfields[i][1:(len(subfields[i]))])
+            else:
+                new_subfield = SubfieldRecord(subfield_code=subfields[i][0],
+                                              data=subfields[i][1:(len(subfields[i]) - 1)])
             new_record.subfields.append(new_subfield)
-
-            if ln[i + 1] is chr(30) or ln[i + 1] is chr(31) or ln[i + 1] is '\n':
-                continue
-
-            i = next(special_case_iterator, None)
-            subfield_data_iter = iter(range(i, len(ln)))
-
-            for k in subfield_data_iter:
-                if ln[k] is chr(30) or ln[k] is chr(31) or ln[k] is '\n':
-                    break
-                new_subfield.data = new_subfield.data + ln[k]
-
-            for m in range(i, k - 1):
-                next(special_case_iterator, None)
-
-    for i in book_iterator:
-        if ln[i] is '\n':
-            break
-        if ln[i] is chr(30):
-            new_record = Record()
-            for j in range(0, 3):
-                i = next(book_iterator, None)
-                if i is None:
-                    print('I is None')
-                new_record.record_code = new_record.record_code + ln[i]
-            new_book.records.append(new_record)
-
-            record_iterator = iter(range(i, len(ln)))
-
-            for j in record_iterator:
-                if ln[j] is chr(30) or ln[j] is '\n':
-                    break
-                if ln[j] is chr(31):
-                    j = next(record_iterator, None)
-
-                    new_subfield = SubfieldRecord(subfield_code=ln[j])
-
-                    new_record.subfields.append(new_subfield)
-
-                    if ln[j + 1] is chr(30) or ln[j + 1] is chr(31) or ln[j + 1] is '\n':
-                        continue
-
-                    j = next(record_iterator, None)
-                    subfield_data_iter = iter(range(j, len(ln)))
-
-                    for k in subfield_data_iter:
-                        if ln[k] is chr(30) or ln[k] is chr(31) or ln[k] is '\n':
-                            break
-                        new_subfield.data = new_subfield.data + ln[k]
-
-                    for m in range(j, k - 1):
-                        next(record_iterator, None)
 
 
 def parse_prefix_file(ln=''):
@@ -181,27 +124,29 @@ def parse_prefix_names_file(ln=''):
         prefix_name.name = prefix_name.name + ln[1][i]
 
 
+start = time.time()
+
 with open(file='fajlovi/knjige.txt', encoding='utf8') as fp:
     count = 0
     for line in fp:
         parse_book_file(ln=line)
 
-for b in books:
-    print(b)
-
-
 with open(file='fajlovi/prefiksi.txt', encoding='utf8') as fp:
     for line in fp:
         parse_prefix_file(ln=line)
-
-for p in prefixes:
-    print(p)
-
 
 with open(file='fajlovi/PrefixNames_sr.properties', encoding='utf8') as fp:
     for line in fp:
         parse_prefix_names_file(ln=line)
 
+# for b in books:
+#     print(b)
+#
+# for p in prefixes:
+#     print(p)
+#
+# for p_n in prefix_names:
+#     print(p_n)
 
-for p_n in prefix_names:
-    print(p_n)
+end = time.time()
+print('TOTAL TIME:', end - start)
