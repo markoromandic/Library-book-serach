@@ -52,12 +52,14 @@ class PrefixName(object):
 
 
 class Prefix(object):
-    def __init__(self, prefix_code='', record_code=''):
+    def __init__(self, prefix_code='', field_code='', subfield_code=''):
         self.prefix_code = prefix_code
-        self.record_code = record_code
+        self.field_code = field_code
+        self.subfield_code = subfield_code
 
     def __str__(self):
-        return 'Prefix code: ' + self.prefix_code + ' Record code: ' + self.record_code
+        return 'Prefix code: ' + self.prefix_code + ' Field code: ' + self.field_code + ' Subfield code: ' \
+               + self.subfield_code
 
 
 def parse_book_file(ln=''):
@@ -88,7 +90,7 @@ def parse_prefix_file(ln=''):
 
     ln = re.split('-', ln)
 
-    prefix = Prefix(prefix_code=ln[0][0:2], record_code=ln[1][0:4])
+    prefix = Prefix(prefix_code=ln[0][0:2], field_code=ln[1][0:3], subfield_code=ln[1][3])
 
     prefixes.append(prefix)
 
@@ -116,11 +118,11 @@ with open(file='fajlovi/PrefixNames_sr.properties', encoding='utf8') as fp:
     for line in fp:
         parse_prefix_names_file(ln=line)
 
-# for b in books:
-#     print(b)
-#
-# for p in prefixes:
-#     print(p)
-#
-# for p_n in prefix_names:
-#     print(p_n)
+for b in books:
+    print(b)
+
+for p in prefixes:
+    print(p)
+
+for p_n in prefix_names:
+    print(p_n)
