@@ -19,8 +19,10 @@ class Book(object):
 
 
 class Record(object):
-    def __init__(self, record_code=''):
+    def __init__(self, record_code='', first_indicator='',second_indicator=''):
         self.record_code = record_code
+        self.first_indicator = first_indicator
+        self.second_indicator = second_indicator
         self.subfields = []
 
     def prepareSubfields(self):
@@ -32,7 +34,8 @@ class Record(object):
         return line
 
     def __str__(self):
-        return 'Record code: ' + self.record_code + ' Subfields: ' + self.prepareSubfields()
+        return 'Record code: ' + self.record_code + ' First indicator: ' + self.first_indicator \
+               + ' Second indicator: ' + self.second_indicator + ' Subfields: ' + self.prepareSubfields()
 
 
 class SubfieldRecord(object):
@@ -74,7 +77,7 @@ def parse_book_file(ln=''):
 
     for r in records:
         subfields = re.split(chr(31), r)
-        new_record = Record(subfields[0][0:3])
+        new_record = Record(subfields[0][0:3], first_indicator=subfields[0][3], second_indicator=subfields[0][4])
         new_book.records.append(new_record)
 
         for i in range(1, len(subfields)):
@@ -114,13 +117,14 @@ with open(file='fajlovi/knjige.txt', encoding='utf8') as fp:
         if count < 100:
             parse_book_file(ln=line)
 
-with open(file='fajlovi/prefiksi.txt', encoding='utf8') as fp:
-    for line in fp:
-        parse_prefix_file(ln=line)
+# with open(file='fajlovi/prefiksi.txt', encoding='utf8') as fp:
+#     for line in fp:
+#         parse_prefix_file(ln=line)
+#
+# with open(file='fajlovi/PrefixNames_sr.properties', encoding='utf8') as fp:
+#     for line in fp:
+#         parse_prefix_names_file(ln=line)
 
-with open(file='fajlovi/PrefixNames_sr.properties', encoding='utf8') as fp:
-    for line in fp:
-        parse_prefix_names_file(ln=line)
 
 # for b in books:
 #     print(b)
@@ -231,5 +235,3 @@ def insert_books_into_database():
     print(total_time)
 
 insert_books_into_database()
-
-
