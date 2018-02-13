@@ -140,7 +140,7 @@ def insert_prefexes_into_database(cursor):
     global prefixes
     add_prefix = ("INSERT INTO prefix "
                     "(prefix_code, field_code, subfield_code ) "
-                    "VALUES (%(prefix_code)s, %(field_code)s, %(subfield_code)s)")
+                    "VALUES (%(prefix_code)s, %(field_code)s, %(subfield_code)s))")
     for prefix in prefixes:
         data_prefix = {
             'prefix_code': prefix.prefix_code,
@@ -186,11 +186,13 @@ def add_subfield_into_database(subfield, id_field, cursor):
 
 def add_record_into_database(record, id_book,cursor):
     add_field = ("INSERT INTO field "
-                  "(code, id_book) "
-                  "VALUES (%(code)s, %(id_book)s)")
+                  "(code, id_book, first_indicator, second_indicator) "
+                  "VALUES (%(code)s, %(id_book)s, %(first_indicator)s, %(second_indicator)s)")
     data_field = {
         'code': record.record_code,
         'id_book': id_book,
+        'first_indicator': record.first_indicator,
+        'second_indicator': record.second_indicator,
     }
     try:
         cursor.execute(add_field, data_field)
