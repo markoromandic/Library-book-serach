@@ -110,20 +110,17 @@ def parse_prefix_names_file(ln=''):
     prefix_names.append(prefix_name)
 
 
-with open(file='fajlovi/knjige.txt', encoding='utf8') as fp:
-    count = 0
+with open(file='fajlovi/knjige.txt', encoding='utf 8') as fp:
     for line in fp:
-        count = count + 1
-        if count < 100:
-            parse_book_file(ln=line)
+        parse_book_file(ln=line)
 
-# with open(file='fajlovi/prefiksi.txt', encoding='utf8') as fp:
-#     for line in fp:
-#         parse_prefix_file(ln=line)
-#
-# with open(file='fajlovi/PrefixNames_sr.properties', encoding='utf8') as fp:
-#     for line in fp:
-#         parse_prefix_names_file(ln=line)
+with open(file='fajlovi/prefiksi.txt', encoding='utf8') as fp:
+    for line in fp:
+        parse_prefix_file(ln=line)
+
+with open(file='fajlovi/PrefixNames_sr.properties', encoding='utf8') as fp:
+    for line in fp:
+        parse_prefix_names_file(ln=line)
 
 
 # for b in books:
@@ -135,12 +132,11 @@ with open(file='fajlovi/knjige.txt', encoding='utf8') as fp:
 # for p_n in prefix_names:
 #     print(p_n)
 
-
 def insert_prefexes_into_database(cursor):
     global prefixes
     add_prefix = ("INSERT INTO prefix "
                     "(prefix_code, field_code, subfield_code ) "
-                    "VALUES (%(prefix_code)s, %(field_code)s, %(subfield_code)s))")
+                    "VALUES (%(prefix_code)s, %(field_code)s, %(subfield_code)s)")
     for prefix in prefixes:
         data_prefix = {
             'prefix_code': prefix.prefix_code,
@@ -158,6 +154,7 @@ def insert_prefex_names_into_database(cursor):
     add_prefix_names = ("INSERT INTO prefix_names "
                     "(prefix_code, prefix_name ) "
                     "VALUES (%(prefix_code)s, %(prefix_name)s)")
+
     for prefix_name in prefix_names:
         data_prefix_names = {
             'prefix_code': prefix_name.prefix_code,
@@ -168,21 +165,6 @@ def insert_prefex_names_into_database(cursor):
         except MySQLdb.Error as err:
             print("Something went wrong6: {}".format(err))
             return
-
-def add_subfield_into_database(subfield, id_field, cursor):
-    add_subfield = ("INSERT INTO subfield "
-                  "(code, content, id_field ) "
-                  "VALUES (%(code)s, %(content)s, %(id_field)s)")
-    data_subfield = {
-        'code': subfield.subfield_code,
-        'content': subfield.data.encode('utf-8'),
-        'id_field': id_field,
-    }
-    try:
-        cursor.execute(add_subfield, data_subfield)
-    except MySQLdb.Error as err:
-        print("Something went wrong3: {}".format(err))
-        return
 
 def add_record_into_database(record, id_book,cursor):
     add_field = ("INSERT INTO field "
@@ -201,30 +183,44 @@ def add_record_into_database(record, id_book,cursor):
         return
 
     id_field = cursor.lastrowid
+
+    add_subfield = ("INSERT INTO subfield "
+                    "(code, content, id_field ) "
+                    "VALUES (%s, %s, %s)")
+    values = []
     for subfield in record.subfields:
-        add_subfield_into_database(subfield=subfield,id_field=id_field,cursor=cursor)
+        values.append((subfield.subfield_code,subfield.data.encode('utf-8'),id_field))
+    try:
+        cursor.executemany(add_subfield, values)
+    except MySQLdb.Error as err:
+        print("Something went wrong3: {}".format(err))
+        return
 
 
 def insert_books_into_database():
     time_start = int(round(time.time() * 1000))
     global books
+    book_count = 0
     conn = MySQLdb.connect(host= "localhost",
                       user="root",
                       passwd="admin",
                       db="mydb")
     cursor = conn.cursor()
+    # for i in range(1,10000):
+    #     cursor.execute("""insert into prefix_names (prefix_code,prefix_name) values ("AA","TEST");""")
     for book in books:
         try:
-            pass
             cursor.execute("INSERT INTO BOOK () VALUES ()")
         except MySQLdb.Error as err:
             print("Something went wrong1: {}".format(err))
             return
 
         id_book = cursor.lastrowid
-
         for record in book.records:
             add_record_into_database(record=record,id_book=id_book,cursor=cursor)
+        book_count += 1
+        if book_count % 100 == 0:
+            print(book_count)
     insert_prefex_names_into_database(cursor=cursor)
     insert_prefexes_into_database(cursor=cursor)
     try:
