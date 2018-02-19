@@ -1,0 +1,161 @@
+// Main Sass File
+.body-pozadina{
+  background-color: #f3f3f3;
+  height: 100%;
+}
+
+#search-box{
+
+  .crta{
+    height: 1px;
+    width: 100%;
+    background-color: #f3f3f3;
+  }
+}
+
+.my-card{
+  background-color: #fff;
+  margin: .5rem 0 1rem 0;
+  padding-bottom: 1px;
+  transition: box-shadow .25s, -webkit-box-shadow .25s;
+  border-radius: 2px;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
+}
+
+#search-text-icon-group{
+  padding:10px 0px 10px 40px;
+  i {
+    font-size: 20px;
+  }
+  span {
+    font-size: 20px;
+    margin-left: 5px;
+  }
+}
+
+.search-fields{
+  margin: 10px 10px 0px 10px;
+  div div div span span{
+      // margin-left: 10px;
+  }
+  .row{
+    margin-bottom: 10px;
+  }
+}
+
+#searchBox{
+  margin: 10px 10px 10px 10px;
+}
+#searchResults{
+  margin: 10px 10px 10px 10px;
+}
+#selectedBox{
+  margin: 10px 10px 3px 10px;
+}
+
+body{
+  background-color: #f3f3f3;
+}
+
+.fa-times-circle {
+  right: 0;
+  position: absolute;
+  margin: 15px;
+}
+
+.izabrani-podaci {
+  margin: 30px 15px 0px 15px;
+}
+
+p {
+  i {
+    margin-right: 10px;
+  }
+}
+
+.read-more{
+  text-align: center;
+  color: grey;
+  font-size: 11px;
+  margin-bottom: 5px;
+}
+
+.read-more:hover{
+  color: blue;
+}
+
+.fa-times-circle:hover{
+  color:blue;
+}
+
+.tr-color:hover{
+  background-color: lightgrey;
+}
+
+input:hover{
+  border-color: blue;
+}
+
+.input-group .form-control{
+  width: 100%;
+}
+// .ui-select-match + .select2-search-field,
+// .ui-select-match + .select2-search-field input{
+//     width: 100% !important;
+// }
+//
+// body > .ui-select-bootstrap.open {
+//     z-index: 1100; /* greater then ui bootstrap modal, that 1050 */
+// }
+//
+// .ui-select-choices{ min-height: 300px; }
+
+.fade.in {
+    opacity: 1;
+}
+
+.modal.in .modal-dialog {
+  -webkit-transform: translate(0, 0);
+       -o-transform: translate(0, 0);
+          transform: translate(0, 0);
+}
+
+.modal-backdrop.in {
+    filter: alpha(opacity=50);
+    opacity: .5;
+}
+
+ .ui-select-choices {
+  display: block;
+  max-width: 500px;
+}
+
+.uiselect-setup{
+  margin: 2px 0px 2px 0px;
+  button:hover {
+    background-color: lightgrey;
+  }
+
+  .ui-select-toggle{
+    width: 300px !important;
+  }
+  .ui-select-toggle:hover{
+    border-color: blue;
+  }
+}
+
+.constant-width-button{
+  width:250px;
+}
+
+.control-me-300{
+  width: 200px !important;
+}
+
+.ui-select-choices{
+  left: 250px;
+}
+
+.ui-select-search{
+  width: 300px !important;
+}
