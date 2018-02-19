@@ -25,7 +25,7 @@ class Record(object):
         self.second_indicator = second_indicator
         self.subfields = []
 
-    def prepareSubfields(self):
+    def prepare_subfields(self):
         line = ''
 
         for s in self.subfields:
@@ -132,7 +132,7 @@ with open(file='fajlovi/PrefixNames_sr.properties', encoding='utf8') as fp:
 # for p_n in prefix_names:
 #     print(p_n)
 
-def insert_prefexes_into_database(cursor):
+def insert_prefixes_into_database(cursor):
     global prefixes
     add_prefix = ("INSERT INTO prefix "
                     "(prefix_code, field_code, subfield_code ) "
@@ -150,7 +150,7 @@ def insert_prefexes_into_database(cursor):
             return
 
 
-def insert_prefex_names_into_database(cursor):
+def insert_prefix_names_into_database(cursor):
     global prefix_names
     add_prefix_names = ("INSERT INTO prefix_names "
                     "(prefix_code, prefix_name ) "
@@ -222,8 +222,8 @@ def insert_books_into_database():
         book_count += 1
         if book_count % 100 == 0:
             print(book_count)
-    insert_prefex_names_into_database(cursor=cursor)
-    insert_prefexes_into_database(cursor=cursor)
+    insert_prefix_names_into_database(cursor=cursor)
+    insert_prefixes_into_database(cursor=cursor)
     try:
         conn.commit()
     except MySQLdb.Error as err:
