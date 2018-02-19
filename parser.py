@@ -149,6 +149,7 @@ def insert_prefexes_into_database(cursor):
             print("Something went wrong5: {}".format(err))
             return
 
+
 def insert_prefex_names_into_database(cursor):
     global prefix_names
     add_prefix_names = ("INSERT INTO prefix_names "
@@ -158,13 +159,14 @@ def insert_prefex_names_into_database(cursor):
     for prefix_name in prefix_names:
         data_prefix_names = {
             'prefix_code': prefix_name.prefix_code,
-            'prefix_name': prefix_name.prefix_name.encode('utf-8'),
+            'prefix_name': prefix_name.prefix_name,
         }
         try:
             cursor.execute(add_prefix_names, data_prefix_names)
         except MySQLdb.Error as err:
             print("Something went wrong6: {}".format(err))
             return
+
 
 def add_record_into_database(record, id_book,cursor):
     add_field = ("INSERT INTO field "
@@ -189,7 +191,7 @@ def add_record_into_database(record, id_book,cursor):
                     "VALUES (%s, %s, %s)")
     values = []
     for subfield in record.subfields:
-        values.append((subfield.subfield_code,subfield.data.encode('utf-8'),id_field))
+        values.append((subfield.subfield_code,subfield.data,id_field))
     try:
         cursor.executemany(add_subfield, values)
     except MySQLdb.Error as err:
@@ -202,12 +204,11 @@ def insert_books_into_database():
     global books
     book_count = 0
     conn = MySQLdb.connect(host= "localhost",
-                      user="root",
-                      passwd="admin",
-                      db="mydb")
+                        user="root",
+                        passwd="toor",
+                        db="library_unimarc",
+                        charset='utf8')
     cursor = conn.cursor()
-    # for i in range(1,10000):
-    #     cursor.execute("""insert into prefix_names (prefix_code,prefix_name) values ("AA","TEST");""")
     for book in books:
         try:
             cursor.execute("INSERT INTO BOOK () VALUES ()")
@@ -217,7 +218,7 @@ def insert_books_into_database():
 
         id_book = cursor.lastrowid
         for record in book.records:
-            add_record_into_database(record=record,id_book=id_book,cursor=cursor)
+            add_record_into_database(record=record, id_book=id_book, cursor=cursor)
         book_count += 1
         if book_count % 100 == 0:
             print(book_count)
@@ -231,5 +232,6 @@ def insert_books_into_database():
     conn.close()
     total_time = int(round(time.time() * 1000)) - time_start
     print(total_time)
+
 
 insert_books_into_database()
