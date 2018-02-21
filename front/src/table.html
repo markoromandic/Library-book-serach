@@ -1,0 +1,19 @@
+
+<table class="table my-card">
+    <thead>
+      <tr>
+        <th>Naiv</th>
+        <th>Izdavac</th>
+        <th>Ime autora</th>
+        <th>Prezime autora</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="tr-color" ng-repeat="k in searchResults | filter:filterByNaziv | limitTo: 100" ng-click="izabran(k)">
+        <td>{{k.naziv}}</td>
+        <td>{{k.izdavac}}</td>
+        <td>{{k.ime}}</td>
+        <td>{{k.prezime}}</td>
+      </tr>
+    </tbody>
+  </table>
